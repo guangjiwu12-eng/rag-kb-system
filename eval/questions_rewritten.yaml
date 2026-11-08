@@ -1,0 +1,113 @@
+- id: r01
+  question: 消防控制室值班的人，一个人一天最多盯多久？最少得几个人一起？
+  answer: 每班工作时间不大于 8h，每班人员不少于 2 人；并且实行每日 24h 值班制度。
+  type: answerable
+  gold:
+  - doc: GB25201-2010_建筑消防设施的维护管理.pdf
+    page: 3
+    anchor: 每班工作时间应不大于8h，每班人员应不少于2人
+  rewritten_from: n1
+- id: r02
+  question: 这些消防设施是不是每年都得找人来测一遍？最少多久一次？
+  answer: 每年至少检测一次，检测对象包括全部系统设备、组件等。
+  type: answerable
+  gold:
+  - doc: GB25201-2010_建筑消防设施的维护管理.pdf
+    page: 5
+    anchor: 建筑消防设施应每年至少检测一次
+  rewritten_from: n2
+- id: r03
+  question: 烟感探头说明书上没写的话，隔多久得拆下来洗一次、校一次？
+  answer: 每二年清洗、标定一次；标定应由生产企业或具备资质的检测机构承担。
+  type: answerable
+  gold:
+  - doc: GB25201-2010_建筑消防设施的维护管理.pdf
+    page: 8
+    anchor: 应每二年清洗、标定一次
+  rewritten_from: n3
+- id: r04
+  question: 烟感探测器离墙最近能装到多近？
+  answer: 不应小于 0.5m。
+  type: answerable
+  gold:
+  - doc: GB50116-2013_火灾自动报警系统设计规范.pdf
+    page: 49
+    anchor: 点型探测器至墙壁、梁边的水平距离，不应小于 0.5m
+  rewritten_from: n7
+- id: r05
+  question: 探测器装歪了的话，最多能歪多少度？
+  answer: 宜水平安装；确需倾斜安装时，倾斜角不应大于 45°。
+  type: answerable
+  gold:
+  - doc: GB50116-2013_火灾自动报警系统设计规范.pdf
+    page: 49
+    anchor: 倾斜角不应大于 45°
+  rewritten_from: n8
+- id: r06
+  question: 工地上报警系统那些探头、手报，得留多少备用的？
+  answer: 应有不少于设备总数 1% 的备品。
+  type: answerable
+  gold:
+  - doc: GB50166-2019_火灾自动报警系统施工及验收标准.pdf
+    page: 79
+    anchor: 不同类型的探测器、手报、模块等现场部件应有不少于设备总数1%的备品
+  rewritten_from: n11
+- id: r07
+  question: 消防水泵控制柜上的机械应急启动装置，从报警到水泵正常运转最多不能超过多久？
+  answer: 应确保消防水泵在报警后 5.0min 内正常工作。
+  type: answerable
+  gold:
+  - doc: GB50974-2014_消防给水及消火栓系统技术规范.pdf
+    page: 97
+    anchor: 应确保消防水泵在报警后5.0min内正常工作
+  rewritten_from: n16
+  rewrite_note: 初版改写引入语义漂移，模型拒答是对的；已改回与原条文同一口径
+- id: r08
+  question: 控制柜跟水泵放在同一个屋子里，防尘防水等级最低要多少？
+  answer: 不应低于 IP55（设在专用控制室时不应低于 IP30）。
+  type: answerable
+  gold:
+  - doc: GB50974-2014_消防给水及消火栓系统技术规范.pdf
+    page: 97
+    anchor: 与消防水泵设置在同一空间时，其防护等级不应低于IP55
+  rewritten_from: n17
+- id: r09
+  question: 靠窗户自然进风补风的话，风口的风速别超过多少？
+  answer: 自然补风口的风速不宜大于 3m/s（机械送风口一般场所不宜大于 10m/s、人员密集场所不宜大于 5m/s）。
+  type: answerable
+  gold:
+  - doc: GB51251-2017_建筑防烟排烟系统技术标准.pdf
+    page: 50
+    anchor: 自然补风口的风速不宜大于3m/s
+  - doc: GB51251-2017_建筑防烟排烟系统技术标准.pdf
+    page: 51
+    anchor: 自然补风口的风速不宜大于3m/s
+  rewritten_from: n19
+- id: r10
+  question: 着火之后，危险区域的应急灯必须在多久之内亮起来？
+  answer: 不应大于 0.25s；其他场所不应大于 5s。
+  type: answerable
+  gold:
+  - doc: GB51309-2018_消防应急照明和疏散指示系统技术标准.pdf
+    page: 11
+    anchor: 高危险场所灯具光源应急点亮的响应时间不应大于0.25s
+  rewritten_from: n21
+  rewrite_note: 初版改写引入语义漂移，模型拒答是对的；已改回与原条文同一口径
+- id: r11
+  question: 一台应急照明的主机，最多能带多少个灯？
+  answer: 不应大于 3200 只；超过时应设置多台控制器。
+  type: answerable
+  gold:
+  - doc: GB51309-2018_消防应急照明和疏散指示系统技术标准.pdf
+    page: 26
+    anchor: 任一台应急照明控制器直接控制灯具的总数量不应大于3200
+  rewritten_from: n22
+- id: r12
+  question: 车间里供人疏散的主通道，最窄不能窄于多少？
+  answer: 主要疏散通道宽度不应小于 2.0m，其他疏散通道不应小于 1.5m。
+  type: answerable
+  gold:
+  - doc: GBT40248-2021_人员密集场所消防安全管理.pdf
+    page: 23
+    anchor: 通向疏散出口的主要疏散通道的宽度不应小于2.0m
+  rewritten_from: n28

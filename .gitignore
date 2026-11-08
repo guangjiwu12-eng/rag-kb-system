@@ -1,0 +1,30 @@
+# 环境与密钥
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 工具缓存
+.pytest_cache/
+.ruff_cache/
+
+# 运行数据（保留目录占位）
+data/*
+!data/.gitkeep
+chroma_db/*
+!chroma_db/.gitkeep
+
+# 本地模型权重（bge-m3 约 2.3 GB，谁都不该把它提交进仓库）
+models/
+
+# 评测产物：含文档原文摘录与模型回答，只留本地
+eval/results/
+
+# 其他
+*.log
+.DS_Store
+get-pip.py

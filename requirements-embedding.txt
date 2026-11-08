@@ -1,0 +1,17 @@
+# 可选依赖：本地 Embedding（EMBEDDING_BACKEND=sentence-transformers）
+#
+# 只有把向量化从「云端 text-embedding-*」换成「本地 bge-m3」时才需要装。
+# 装进来的是 torch（CPU 版约 200 MB）和权重（bge-m3 约 2.3 GB），所以不放进
+# requirements.txt —— 默认路线不该为一条可选分支付 2 GB 的代价。
+#
+#   pip install -r requirements-embedding.txt
+#   # Windows / 无 GPU 的机器建议先装 CPU 版 torch，体积小一半以上：
+#   # pip install torch --index-url https://download.pytorch.org/whl/cpu
+#
+# 权重下载（国内直连 HuggingFace 通常不通，走 ModelScope）：
+#   pip install modelscope
+#   modelscope download --model BAAI/bge-m3 --local_dir ./models/bge-m3
+# 然后把 EMBEDDING_MODEL 指向该目录的绝对路径，避免每次启动都去连 huggingface.co。
+
+torch>=2.1
+transformers>=4.41,<6.0

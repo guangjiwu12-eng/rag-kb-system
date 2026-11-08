@@ -1,0 +1,20 @@
+# 可选依赖：Cross-encoder 重排（RETRIEVAL_MODE 里带 rerank 的档位）
+
+# 重排模型 bge-reranker-v2-m3 是 568M 参数的 xlm-roberta，跑在 torch 上是 2.2 GB 权重。
+# 只在「要用重排档」时才需要装；纯向量 / +BM25 / +RRF 三档不依赖这个文件。
+#
+#   pip install -r requirements-rerank.txt
+#   # CPU 机器建议先装 CPU 版 torch（体积小一半以上）：
+#   # pip install torch --index-url https://download.pytorch.org/whl/cpu
+#
+# 权重下载（国内直连 HuggingFace 通常不通，走 ModelScope）：
+#   python -c "from modelscope import snapshot_download; \
+#       snapshot_download('BAAI/bge-reranker-v2-m3', local_dir='./models/bge-reranker-v2-m3')"
+#
+# 想要 CPU 上快 3 倍，再导一份 int8 ONNX（额外要 onnx + onnxruntime + onnxscript）：
+#   python scripts/export_reranker_onnx.py
+#   然后把 RERANK_ONNX_PATH 指到导出的目录
+
+transformers>=4.38
+# onnxruntime 可选：只有走 int8 ONNX 后端时才真正用得上
+onnxruntime>=1.17

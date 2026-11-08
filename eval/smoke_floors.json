@@ -1,0 +1,11 @@
+{
+  "suite": {
+    "answerable": 7,
+    "unanswerable": 3
+  },
+  "metrics": {
+    "loose_hit@6": 0.85,
+    "strict_hit@6": 0.7,
+    "loose_mrr": 0.7
+  }
+}

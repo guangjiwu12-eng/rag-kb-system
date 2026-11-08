@@ -1,0 +1,503 @@
+{
+  "generated_at": "2026-11-01T20:11:18+08:00",
+  "config_hash": "c573b7",
+  "base_url": "http://127.0.0.1:8035",
+  "config": {
+    "embedding_model": "D:/workbuddy-space/models/bge-m3",
+    "chunk_size": 800,
+    "chunk_overlap": 150,
+    "min_score": 0.3,
+    "top_k": 6,
+    "retrieval_mode": "vector",
+    "collection": "kb_documents",
+    "k": 6,
+    "retrieve_k": 20
+  },
+  "corpus": {
+    "documents": 14,
+    "chunks": 1335
+  },
+  "counts": {
+    "answerable": 40,
+    "unanswerable": 10,
+    "gold_resolved": 54,
+    "gold_strict_resolved": 50,
+    "gold_unresolved": 0,
+    "alternate_golds": 3
+  },
+  "metrics": {
+    "strict_hit@6": 0.825,
+    "strict_mrr": 0.5887,
+    "strict_n": 40,
+    "loose_hit@6": 0.875,
+    "loose_mrr": 0.6221,
+    "loose_n": 40,
+    "caliber_gap": 0.05,
+    "e2e_answer_rate": 0.8,
+    "e2e_n": 40,
+    "answerable_refused_rate": 0.125,
+    "refused_after_miss_rate": 0.05,
+    "refused_despite_hit_rate": 0.075,
+    "answered_after_miss_rate": 0.075,
+    "abstain_by_threshold": 0.0,
+    "abstain_by_llm": 1.0,
+    "false_answer_rate": 0.0,
+    "retrieval_p50_ms": 799.0,
+    "retrieval_p95_ms": 10247.0
+  },
+  "caveats": [
+    "延迟不可信：测量时机器上另有 2 个 2GB 级 Python 进程占用 CPU；空闲时同配置实测 132/224ms。hit/MRR/拒答类指标不受影响。"
+  ],
+  "cases": [
+    {
+      "id": "q001",
+      "type": "answerable",
+      "rank_strict": 2,
+      "rank_loose": 2,
+      "top1": 0.7472,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "q002",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.722,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "q003",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.7689,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "q004",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.5918,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "q005",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.6414,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "q006",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.7352,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "q007",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.7515,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "q008",
+      "type": "answerable",
+      "rank_strict": 2,
+      "rank_loose": 2,
+      "top1": 0.6976,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "q009",
+      "type": "answerable",
+      "rank_strict": 14,
+      "rank_loose": 14,
+      "top1": 0.7027,
+      "category": "排名靠后（第 14，需 rerank）",
+      "abstained": false
+    },
+    {
+      "id": "q010",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.7142,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "q011",
+      "type": "unanswerable",
+      "rank_strict": null,
+      "rank_loose": null,
+      "top1": 0.5822,
+      "category": "-",
+      "abstained": false
+    },
+    {
+      "id": "q012",
+      "type": "unanswerable",
+      "rank_strict": null,
+      "rank_loose": null,
+      "top1": 0.6598,
+      "category": "-",
+      "abstained": false
+    },
+    {
+      "id": "q013",
+      "type": "unanswerable",
+      "rank_strict": null,
+      "rank_loose": null,
+      "top1": 0.6135,
+      "category": "-",
+      "abstained": false
+    },
+    {
+      "id": "q014",
+      "type": "unanswerable",
+      "rank_strict": null,
+      "rank_loose": null,
+      "top1": 0.6742,
+      "category": "-",
+      "abstained": false
+    },
+    {
+      "id": "n1",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.6758,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n2",
+      "type": "answerable",
+      "rank_strict": 18,
+      "rank_loose": 18,
+      "top1": 0.6901,
+      "category": "排名靠后（第 18，需 rerank）",
+      "abstained": false
+    },
+    {
+      "id": "n3",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.6947,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n4",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.7972,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n5",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.7524,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n6",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.7676,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n7",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.764,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n8",
+      "type": "answerable",
+      "rank_strict": 2,
+      "rank_loose": 2,
+      "top1": 0.6881,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n9",
+      "type": "answerable",
+      "rank_strict": 13,
+      "rank_loose": 3,
+      "top1": 0.685,
+      "category": "仅宽松命中（第 3 位是替代承载文档）",
+      "abstained": false
+    },
+    {
+      "id": "n10",
+      "type": "answerable",
+      "rank_strict": 5,
+      "rank_loose": 5,
+      "top1": 0.6501,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n11",
+      "type": "answerable",
+      "rank_strict": 5,
+      "rank_loose": 5,
+      "top1": 0.7219,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n12",
+      "type": "answerable",
+      "rank_strict": 9,
+      "rank_loose": 5,
+      "top1": 0.7426,
+      "category": "仅宽松命中（第 5 位是替代承载文档）",
+      "abstained": false
+    },
+    {
+      "id": "n13",
+      "type": "answerable",
+      "rank_strict": 4,
+      "rank_loose": 4,
+      "top1": 0.7123,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n14",
+      "type": "answerable",
+      "rank_strict": 3,
+      "rank_loose": 3,
+      "top1": 0.7593,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n15",
+      "type": "answerable",
+      "rank_strict": 2,
+      "rank_loose": 2,
+      "top1": 0.7447,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n16",
+      "type": "answerable",
+      "rank_strict": 7,
+      "rank_loose": 7,
+      "top1": 0.7639,
+      "category": "近截断（排第 7）",
+      "abstained": false
+    },
+    {
+      "id": "n17",
+      "type": "answerable",
+      "rank_strict": 3,
+      "rank_loose": 3,
+      "top1": 0.7635,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n18",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.7803,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n19",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.6579,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n20",
+      "type": "answerable",
+      "rank_strict": 8,
+      "rank_loose": 8,
+      "top1": 0.735,
+      "category": "近截断（排第 8）",
+      "abstained": false
+    },
+    {
+      "id": "n21",
+      "type": "answerable",
+      "rank_strict": 5,
+      "rank_loose": 5,
+      "top1": 0.7346,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n22",
+      "type": "answerable",
+      "rank_strict": 3,
+      "rank_loose": 3,
+      "top1": 0.7038,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n23",
+      "type": "answerable",
+      "rank_strict": null,
+      "rank_loose": null,
+      "top1": 0.6949,
+      "category": "未进 top20",
+      "abstained": false
+    },
+    {
+      "id": "n24",
+      "type": "answerable",
+      "rank_strict": 5,
+      "rank_loose": 1,
+      "top1": 0.8031,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n25",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.6937,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n26",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.6346,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n27",
+      "type": "answerable",
+      "rank_strict": 2,
+      "rank_loose": 2,
+      "top1": 0.7292,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n28",
+      "type": "answerable",
+      "rank_strict": 1,
+      "rank_loose": 1,
+      "top1": 0.7543,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n29",
+      "type": "answerable",
+      "rank_strict": 2,
+      "rank_loose": 2,
+      "top1": 0.6267,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n30",
+      "type": "answerable",
+      "rank_strict": 2,
+      "rank_loose": 2,
+      "top1": 0.6536,
+      "category": "命中",
+      "abstained": false
+    },
+    {
+      "id": "n31",
+      "type": "unanswerable",
+      "rank_strict": null,
+      "rank_loose": null,
+      "top1": 0.5765,
+      "category": "-",
+      "abstained": false
+    },
+    {
+      "id": "n32",
+      "type": "unanswerable",
+      "rank_strict": null,
+      "rank_loose": null,
+      "top1": 0.7275,
+      "category": "-",
+      "abstained": false
+    },
+    {
+      "id": "n33",
+      "type": "unanswerable",
+      "rank_strict": null,
+      "rank_loose": null,
+      "top1": 0.639,
+      "category": "-",
+      "abstained": false
+    },
+    {
+      "id": "n34",
+      "type": "unanswerable",
+      "rank_strict": null,
+      "rank_loose": null,
+      "top1": 0.6728,
+      "category": "-",
+      "abstained": false
+    },
+    {
+      "id": "n35",
+      "type": "unanswerable",
+      "rank_strict": null,
+      "rank_loose": null,
+      "top1": 0.6984,
+      "category": "-",
+      "abstained": false
+    },
+    {
+      "id": "n36",
+      "type": "unanswerable",
+      "rank_strict": null,
+      "rank_loose": null,
+      "top1": 0.6244,
+      "category": "-",
+      "abstained": false
+    }
+  ]
+}

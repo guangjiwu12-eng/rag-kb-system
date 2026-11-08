@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-test:
+    name: ruff + pytest (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.11 是 pyproject 里的 target-version，3.12 是本机实际运行版本
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: 安装依赖
+        run: pip install -r requirements-dev.txt
+
+      - name: 静态检查
+        run: ruff check .
+
+      - name: 单测
+        run: pytest
+
+  eval-gate:
+    # 为什么不在这里跑评测：bge-m3 权重 2.3 GB、14 篇语料、还要模型 key，
+    # runner 既跑不动也不该为此付调用费。分工是：
+    #   本机 scripts/smoke_eval.sh   → 10 题下限（快，提交前跑）
+    #   本机 eval/eval.py + diff_eval.py --fail-on-regression → 50 题回归
+    # 这里只做兜底：万一评测产物被提交上来，就顺手判一次。
+    name: 指标闸门（有产物时才跑）
+    runs-on: ubuntu-latest
+    needs: lint-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 对比基线与最新评测
+        run: |
+          if [ -f eval/results/latest.json ] && [ -f eval/baseline.json ]; then
+            python scripts/diff_eval.py --fail-on-regression
+          else
+            echo "没有 eval/results/latest.json 或 eval/baseline.json，跳过指标闸门"
+          fi

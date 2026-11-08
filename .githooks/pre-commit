@@ -1,0 +1,60 @@
+#!/bin/sh
+# 阻止把密钥 / 私有文档提交进仓库。
+#
+# 启用方法（在 WSL 里执行一次， repository 已配好 core.hooksPath）：
+#   chmod +x .githooks/pre-commit
+#
+# 为什么需要它：这个仓库 12 月要 push 到公开平台给面试官看，而 .env 里放着真实的
+# 大模型密钥。一旦手滑 git add -A 或某个工具自动追踪，密钥就不可逆地进了历史。
+# 这道闸门让「提交密钥」这件事变成物理不可能，而不是靠记性。
+
+set -e
+
+# 路径黑名单：匹配到的文件一律不许提交
+blocked_paths=".env .env.local .env.production .env.*.local"
+
+# 内容黑名单：真密钥长得像 <前缀><30 位以上随机串>；.env.example 里的
+# sk-xxxxxxxxxxxxxxxx 只有 16 位占位符，不会被误伤
+secret_pattern='(sk-|sk-|AKID|DASHSCOPE_API_KEY=|DEEPSEEK_API_KEY=)[A-Za-z0-9_./+=-]{30,}'
+
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+[ -z "$staged" ] && exit 0
+
+failed=0
+
+for file in $staged; do
+    # 1) 敏感文件本身
+    case "$file" in
+        .env.example) ;;  # 模板文件，只有占位符，必须能提交
+        .env|.env.*|.envrc)
+            echo "✗ [$file] 疑似密钥文件，禁止提交（如需强行提交请 git add -f 并三思）"
+            failed=1
+            continue
+            ;;
+        *.sqlite3|chroma_db/*|data/*.pdf|data/*.docx)
+            echo "✗ [$file] 私有数据文件，禁止提交"
+            failed=1
+            continue
+            ;;
+    esac
+
+    # 2) 文件内容里的密钥
+    if [ -f "$file" ]; then
+        hit=$(grep -nE "$secret_pattern" "$file" 2>/dev/null | head -3)
+        if [ -n "$hit" ]; then
+            echo "✗ [$file] 内容里检测到疑似密钥："
+            echo "$hit" | sed 's/^/    /'
+            failed=1
+        fi
+    fi
+done
+
+if [ "$failed" -ne 0 ]; then
+    echo ""
+    echo "提交已中止。若确定是误报："
+    echo "  临时跳过本次检查：git commit --no-verify"
+    echo "  永久调整规则：    编辑 .githooks/pre-commit"
+    exit 1
+fi
+
+exit 0

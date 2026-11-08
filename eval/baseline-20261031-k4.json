@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-10-31T22:35:00+08:00",
+  "config_hash": "c2907d",
+  "suite": {
+    "answerable": 40,
+    "unanswerable": 10
+  },
+  "corpus": {
+    "documents": 14,
+    "chunks": 1335
+  },
+  "config": {
+    "min_score": 0.3,
+    "k": 4,
+    "retrieve_k": 20,
+    "chunk_size": 800,
+    "chunk_overlap": 150
+  },
+  "metrics": {
+    "hit@4": 0.725,
+    "mrr": 0.5687,
+    "false_abstain_rate": 0.0,
+    "abstain_by_threshold": 0.0,
+    "abstain_by_llm": 1.0,
+    "false_answer_rate": 0.0,
+    "retrieval_p50_ms": 115.0,
+    "retrieval_p95_ms": 157.0
+  }
+}

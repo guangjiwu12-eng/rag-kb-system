@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RAG 知识库问答</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --border: #e4e7ec;
+    --text: #14171f;
+    --muted: #6b7280;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --danger: #dc2626;
+    --ok: #059669;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 8px 24px rgba(16, 24, 40, .06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1115;
+      --panel: #161922;
+      --border: #262b36;
+      --text: #e6e8ee;
+      --muted: #98a2b3;
+      --accent: #818cf8;
+      --accent-soft: #1e2233;
+      --danger: #f87171;
+      --ok: #34d399;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.6 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, textarea, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  .app {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    height: 100vh;
+    max-width: 1440px;
+    margin: 0 auto;
+    background: var(--bg);
+  }
+
+  /* ---------- 侧栏 ---------- */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px 18px;
+    border-right: 1px solid var(--border);
+    min-height: 0;
+  }
+  .brand h1 { margin: 0; font-size: 17px; letter-spacing: .2px; }
+  .brand p { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; }
+  .stats {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--panel);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .stats b { color: var(--text); font-weight: 600; }
+  .stats .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); margin-top: 7px; flex: none; }
+  .stats .dot.warn { background: #d97706; }
+
+  .dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 20px 12px;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    background: var(--panel);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .dropzone:hover, .dropzone.dragover { border-color: var(--accent); background: var(--accent-soft); }
+  .dropzone.uploading { opacity: .6; pointer-events: none; }
+  .dz-title { font-weight: 600; }
+  .dz-hint { color: var(--muted); font-size: 12px; }
+
+  .list-head {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 0 2px;
+  }
+  .doc-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+  .doc {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel);
+  }
+  .doc .meta { min-width: 0; flex: 1; }
+  .doc .name { display: block; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .doc .sub { font-size: 11.5px; color: var(--muted); }
+  .doc .del {
+    border: 0; background: transparent; color: var(--muted);
+    padding: 2px 4px; border-radius: 6px; line-height: 1;
+  }
+  .doc .del:hover { color: var(--danger); background: var(--accent-soft); }
+  .empty-docs { color: var(--muted); font-size: 12.5px; text-align: center; padding: 18px 0; }
+
+  /* ---------- 主区 ---------- */
+  .chat { display: flex; flex-direction: column; min-height: 0; }
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 26px;
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar h2 { margin: 0; font-size: 14px; font-weight: 600; }
+  .topbar a { color: var(--muted); font-size: 12px; text-decoration: none; }
+  .topbar a:hover { color: var(--accent); }
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    scroll-behavior: smooth;
+  }
+  .hint {
+    margin: auto;
+    max-width: 460px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .hint h3 { color: var(--text); margin: 0 0 8px; font-size: 16px; }
+  .hint p { margin: 4px 0; font-size: 13px; }
+  .hint code { background: var(--accent-soft); padding: 1px 5px; border-radius: 5px; color: var(--accent); }
+
+  .msg { display: flex; gap: 10px; animation: rise .18s ease-out; }
+  @keyframes rise { from { opacity: 0; transform: translateY(4px); } }
+  .msg .who {
+    flex: none; width: 26px; height: 26px; border-radius: 8px;
+    display: grid; place-items: center; font-size: 11px; font-weight: 700;
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .msg.user { flex-direction: row-reverse; }
+  .msg.user .who { background: var(--accent); color: #fff; }
+  .msg .body { max-width: min(760px, 88%); }
+  .bubble {
+    padding: 11px 14px;
+    border-radius: var(--radius);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .msg.user .bubble { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .msg.assistant.error .bubble { border-color: var(--danger); color: var(--danger); }
+  .ref {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 0 4px;
+    border-radius: 4px;
+    margin: 0 1px;
+    vertical-align: 2px;
+    text-decoration: none;
+  }
+  .answer-meta { margin-top: 6px; font-size: 11.5px; color: var(--muted); }
+  .citations { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .cite {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: 9px;
+    background: var(--panel);
+    padding: 8px 11px;
+    font-size: 12.5px;
+  }
+  .cite.used { border-left-color: var(--accent); }
+  .cite .head { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .cite .idx {
+    font-weight: 700; color: var(--accent);
+    background: var(--accent-soft); border-radius: 4px; padding: 0 5px; font-size: 11px;
+  }
+  .cite .file { font-weight: 500; }
+  .cite .page, .cite .score { color: var(--muted); }
+  .cite .unused { color: var(--muted); font-size: 11px; border: 1px solid var(--border); border-radius: 20px; padding: 0 7px; }
+  .cite details { margin-top: 5px; }
+  .cite summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+  .cite pre {
+    margin: 6px 0 0;
+    padding: 8px 10px;
+    background: var(--bg);
+    border-radius: 7px;
+    font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 220px;
+    overflow: auto;
+  }
+
+  .composer {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    padding: 16px 26px 22px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .composer textarea {
+    flex: 1;
+    resize: none;
+    min-height: 46px;
+    max-height: 160px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--panel);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .composer textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .send {
+    flex: none;
+    border: 0;
+    background: var(--accent);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: var(--radius);
+    font-weight: 600;
+  }
+  .send:disabled { opacity: .55; cursor: not-allowed; }
+  .spinner {
+    display: inline-block; width: 12px; height: 12px; margin-right: 8px;
+    border: 2px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -2px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+    background: #111827; color: #fff; padding: 9px 16px; border-radius: 9px;
+    font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s;
+    max-width: 80vw;
+  }
+  .toast.show { opacity: 1; }
+  .toast.error { background: var(--danger); }
+
+  @media (max-width: 880px) {
+    .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: 100vh; }
+    .sidebar { border-right: 0; border-bottom: 1px solid var(--border); max-height: 42vh; }
+    .messages, .topbar, .composer { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>RAG 知识库问答</h1>
+      <p>PDF / TXT → 切片 → 向量检索 → 带引用的回答</p>
+    </div>
+
+    <div class="stats" id="stats">
+      <span class="dot" id="statusDot"></span>
+      <span id="statsText">正在连接服务…</span>
+    </div>
+
+    <label class="dropzone" id="dropzone">
+      <input type="file" id="fileInput" accept=".pdf,.txt" multiple hidden />
+      <span class="dz-title">上传 PDF / TXT</span>
+      <span class="dz-hint">点击选择，或把文件拖到这里</span>
+    </label>
+
+    <div class="list-head"><span>已入库文档</span><span id="docCount">0</span></div>
+    <ul class="doc-list" id="docList"></ul>
+  </aside>
+
+  <main class="chat">
+    <div class="topbar">
+      <h2>对话</h2>
+      <a href="/docs" target="_blank" rel="noreferrer">API 文档 ↗</a>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="hint">
+        <h3>先上传文档，再开始提问</h3>
+        <p>回答只基于你上传的资料，并在句末标注 <code>[1]</code> 这样的来源编号。</p>
+        <p>点击下方引用卡片可展开命中的原文片段。</p>
+      </div>
+    </div>
+
+    <form class="composer" id="askForm">
+      <textarea id="questionInput" rows="1" placeholder="输入你的问题，Enter 发送，Shift+Enter 换行"></textarea>
+      <button class="send" id="sendBtn" type="submit">发送</button>
+    </form>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const API = "/api/v1";
+  const $ = (id) => document.getElementById(id);
+  const messagesEl = $("messages");
+  const docListEl = $("docList");
+  const fileInput = $("fileInput");
+  const dropzone = $("dropzone");
+  const askForm = $("askForm");
+  const questionInput = $("questionInput");
+  const sendBtn = $("sendBtn");
+  const toastEl = $("toast");
+
+  let docCount = 0;
+  let busy = false;
+
+  const esc = (text) => String(text ?? "").replace(/[&<>"']/g, (c) => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+  ));
+
+  const toast = (message, isError = false) => {
+    toastEl.textContent = message;
+    toastEl.className = "toast show" + (isError ? " error" : "");
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => { toastEl.className = "toast"; }, 3200);
+  };
+
+  const scrollToBottom = () => { messagesEl.scrollTop = messagesEl.scrollHeight; };
+
+  async function request(path, options = {}) {
+    const response = await fetch(API + path, options);
+    if (response.status === 204) return null;
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.detail || `请求失败（HTTP ${response.status}）`);
+    }
+    return data;
+  }
+
+  // ---------------- 文档区 ----------------
+  function renderDocs(documents) {
+    docCount = documents.length;
+    $("docCount").textContent = docCount;
+    if (!documents.length) {
+      docListEl.innerHTML = '<li class="empty-docs">还没有文档，上传一个试试</li>';
+      return;
+    }
+    docListEl.innerHTML = documents.map((doc) => {
+      const parts = [`${doc.chunks} 段`];
+      if (doc.file_type === "pdf" && doc.pages) parts.push(`${doc.pages} 页`);
+      if (doc.size_bytes) parts.push(`${(doc.size_bytes / 1024).toFixed(0)} KB`);
+      return `
+        <li class="doc" data-doc-id="${esc(doc.doc_id)}">
+          <div class="meta">
+            <span class="name" title="${esc(doc.file)}">${esc(doc.file)}</span>
+            <span class="sub">${esc(parts.join(" · "))}</span>
+          </div>
+          <button class="del" title="删除" data-delete="${esc(doc.doc_id)}">✕</button>
+        </li>`;
+    }).join("");
+  }
+
+  async function loadDocs() {
+    try {
+      const data = await request("/documents");
+      renderDocs(data.documents);
+      return data;
+    } catch (error) {
+      docListEl.innerHTML = `<li class="empty-docs">文档列表加载失败：${esc(error.message)}</li>`;
+      return null;
+    }
+  }
+
+  async function loadHealth() {
+    try {
+      const health = await request("/health");
+      $("statsText").innerHTML = `共 <b>${health.documents}</b> 篇 · <b>${health.chunks}</b> 个切片`;
+      $("statusDot").className = "dot" + (health.status === "ok" ? "" : " warn");
+      if (health.missing_env && health.missing_env.length) {
+        toast(`缺少环境变量 ${health.missing_env.join("、")}，上传/问答可能不可用`, true);
+      }
+    } catch (error) {
+      $("statsText").textContent = "服务不可用：" + error.message;
+      $("statusDot").className = "dot warn";
+    }
+  }
+
+  async function uploadFiles(files) {
+    const list = Array.from(files || []).filter(Boolean);
+    if (!list.length) return;
+    dropzone.classList.add("uploading");
+    try {
+      for (const file of list) {
+        const body = new FormData();
+        body.append("file", file);
+        const result = await request("/documents", { method: "POST", body });
+        toast(`${result.file} 已入库：${result.chunks} 段${result.replaced ? "（覆盖旧版本）" : ""}`);
+      }
+      await Promise.all([loadDocs(), loadHealth()]);
+    } catch (error) {
+      toast(error.message, true);
+    } finally {
+      dropzone.classList.remove("uploading");
+      fileInput.value = "";
+    }
+  }
+
+  fileInput.addEventListener("change", (event) => uploadFiles(event.target.files));
+
+  ["dragenter", "dragover"].forEach((type) => dropzone.addEventListener(type, (event) => {
+    event.preventDefault();
+    dropzone.classList.add("dragover");
+  }));
+  ["dragleave", "drop"].forEach((type) => dropzone.addEventListener(type, (event) => {
+    event.preventDefault();
+    dropzone.classList.remove("dragover");
+  }));
+  dropzone.addEventListener("drop", (event) => uploadFiles(event.dataTransfer.files));
+
+  docListEl.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-delete]");
+    if (!button) return;
+    const docId = button.dataset.delete;
+    if (!confirm("删除这篇文档及其全部切片？")) return;
+    try {
+      await request(`/documents/${encodeURIComponent(docId)}`, { method: "DELETE" });
+      toast("已删除");
+      await Promise.all([loadDocs(), loadHealth()]);
+    } catch (error) {
+      toast(error.message, true);
+    }
+  });
+
+  // ---------------- 问答区 ----------------
+  function appendUser(text) {
+    const element = document.createElement("div");
+    element.className = "msg user";
+    element.innerHTML = `<span class="who">你</span><div class="body"><div class="bubble">${esc(text)}</div></div>`;
+    messagesEl.appendChild(element);
+    scrollToBottom();
+  }
+
+  function appendAssistant(answer, citations, model, elapsedMs) {
+    const element = document.createElement("div");
+    element.className = "msg assistant";
+    const maxIndex = citations.length;
+    const html = esc(answer).replace(/\[(\d{1,2})\]/g, (match, number) => (
+      Number(number) >= 1 && Number(number) <= maxIndex
+        ? `<a class="ref" href="#cite-${number}">${number}</a>`
+        : match
+    ));
+
+    const cards = citations.map((citation) => {
+      const location = citation.page ? `第 ${citation.page} 页` : "全文";
+      return `
+        <div class="cite ${citation.used ? "used" : ""}" id="cite-${citation.index}">
+          <div class="head">
+            <span class="idx">${citation.index}</span>
+            <span class="file">${esc(citation.file)}</span>
+            <span class="page">${location}</span>
+            <span class="score">相似度 ${(citation.score * 100).toFixed(1)}%</span>
+            ${citation.used ? "" : '<span class="unused">未被引用</span>'}
+          </div>
+          <details><summary>查看原文片段（第 ${citation.chunk_index + 1} 段）</summary><pre>${esc(citation.content)}</pre></details>
+        </div>`;
+    }).join("");
+
+    element.innerHTML = `
+      <span class="who">AI</span>
+      <div class="body">
+        <div class="bubble">${html}</div>
+        <div class="answer-meta">${esc(model)} · ${elapsedMs} ms</div>
+        <div class="citations">${cards}</div>
+      </div>`;
+    messagesEl.appendChild(element);
+    scrollToBottom();
+  }
+
+  function appendError(message) {
+    const element = document.createElement("div");
+    element.className = "msg assistant error";
+    element.innerHTML = `<span class="who">AI</span><div class="body"><div class="bubble">${esc(message)}</div></div>`;
+    messagesEl.appendChild(element);
+    scrollToBottom();
+  }
+
+  function appendLoading() {
+    const element = document.createElement("div");
+    element.className = "msg assistant";
+    element.innerHTML = `<span class="who">AI</span><div class="body"><div class="bubble"><span class="spinner"></span>正在检索资料并生成回答…</div></div>`;
+    messagesEl.appendChild(element);
+    scrollToBottom();
+    return element;
+  }
+
+  async function ask(question) {
+    if (busy) return;
+    busy = true;
+    sendBtn.disabled = true;
+    appendUser(question);
+    const loading = appendLoading();
+    try {
+      const result = await request("/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question }),
+      });
+      loading.remove();
+      appendAssistant(result.answer, result.citations || [], result.model, result.elapsed_ms);
+    } catch (error) {
+      loading.remove();
+      appendError(error.message);
+    } finally {
+      busy = false;
+      sendBtn.disabled = false;
+      questionInput.focus();
+    }
+  }
+
+  askForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const question = questionInput.value.trim();
+    if (!question || busy) return;
+    questionInput.value = "";
+    questionInput.style.height = "auto";
+    ask(question);
+  });
+
+  questionInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      askForm.requestSubmit();
+    }
+  });
+
+  questionInput.addEventListener("input", () => {
+    questionInput.style.height = "auto";
+    questionInput.style.height = Math.min(questionInput.scrollHeight, 160) + "px";
+  });
+
+  // ---------------- 启动 ----------------
+  Promise.all([loadHealth(), loadDocs()]).then(() => {
+    if (!docCount) questionInput.placeholder = "先上传一份 PDF 或 TXT，再提问";
+  });
+})();
+</script>
+</body>
+</html>
